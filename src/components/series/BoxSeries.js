@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import FormularioSeries from './FormularioSeries'
 import TabelaSeries from './TabelaSeries'
+import Autores from '../Autores'
+import Home from '../Home'
 
 
 class BoxSeries extends Component {
@@ -19,28 +21,39 @@ class BoxSeries extends Component {
   }
 
   enviaDados = async (serie) => {
-    console.log('enviando dados....')
+    console.log('enviando dados..')
+    // let { serie } = this.state
+    const method = serie.id ? 'PUT' : 'POST'
     console.log(serie)
     const params = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(serie)
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(serie)
     }
-    try {
-      const retorno = await fetch('http://localhost:3000/series', params)
-      if (retorno.status === 201) {
-        console.log('enviado com sucesso')
-        serie = await retorno.json()
-        this.setState({ series: [...this.state.series, serie] })
+    const urlParam = serie.id || ''
+    try{
+      const retorno = await fetch('http://localhost:3000/series/' + urlParam, params);
+      console.log('enviado com sucesso')
+      serie = await retorno.json()
+      if(retorno.status === 201){
+         return this.setState({series: [...this.state.series, serie],
+          serie: this.novaSerie}
+          ) 
       }
-    } catch (erro) {
-      console.log(erro)
-    }
+      if(retorno.status === 200) {
+          return this.setState({
+              series: this.state.series.map( s => s.id == serie.id ? serie : s),
+              serie: this.novaSerie
+          })
+      }
 
-  }
+    }catch(erro){
+        console.log(erro)
+    }
+    
+}
 
   deleta = async (id) => {
     const seriesAtual = this.state.series
@@ -72,6 +85,8 @@ class BoxSeries extends Component {
               />
           </div>
         </div>
+        {/* <Autores/>
+        <Home/> */}
       </div>
     )
   }

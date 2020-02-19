@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Pubsub from "pubsub-js";
+import Pubsub from 'pubsub-js'
 import './TabelaSeries.css'
 
 
