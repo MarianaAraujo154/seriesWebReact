@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import FormularioSeries from './FormularioSeries'
 import TabelaSeries from './TabelaSeries'
-import Autores from '../Autores'
-import Home from '../Home'
+import { getToken } from '../../services/auth-service'
+import { listar, atualizar, inserir, remover } from '../../services/series-services'
+
+
+
 
 
 class BoxSeries extends Component {
@@ -15,32 +18,25 @@ class BoxSeries extends Component {
   }
 
   async componentDidMount() {
-    let resposta = await fetch('http://localhost:3000/series')
-    const series = await resposta.json()
-    this.setState({ series: series })
-  }
-
-  enviaDados = async (serie) => {
-    console.log('enviando dados..')
-    // let { serie } = this.state
-    const method = serie.id ? 'PUT' : 'POST'
-    console.log(serie)
-    const params = {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(serie)
-    }
-    const urlParam = serie.id || ''
     try{
-      const retorno = await fetch('http://localhost:3000/series/' + urlParam, params);
-      console.log('enviado com sucesso')
-      serie = await retorno.json()
+    const retorno = await listar ()
+    const series = await retorno.json()
+    this.setState({ series: series })
+    }catch(erro){
+      console.log(erro)
+
+    }
+  }
+  enviaDados = async (serie) => {
+    console.log(serie)
+ try{
+   let retorno = ''
+   if(serie.id) retorno = await atualizar(serie)
+   else retorno = await inserir(serie)
       if(retorno.status === 201){
          return this.setState({series: [...this.state.series, serie],
-          serie: this.novaSerie}
-          ) 
+          serie: this.novaSerie
+        }) 
       }
       if(retorno.status === 200) {
           return this.setState({
@@ -57,20 +53,15 @@ class BoxSeries extends Component {
 
   deleta = async (id) => {
     const seriesAtual = this.state.series
-		const params = {
-			method: 'DELETE',
-		}
-		const retorno = await 
-			fetch('http://localhost:3000/series/' + id,params)
-		if(retorno.status === 204){
-			this.setState({
+    const retorno = await remover(id)
+    if(retorno.status === 204 ){
+      this.setState({
         series: seriesAtual.filter((serie) => {
           return serie.id !== id
         })
       })
-		}
-	}
-
+    }
+  }
   render() {
     return (
       <div className="container">

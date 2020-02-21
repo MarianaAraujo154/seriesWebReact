@@ -6,6 +6,7 @@ class FormularioSeries extends Component {
 	constructor() {
 		super()
 		this.stateInicial = {
+			id: null,
 			nome: '',
 			lancamento: '',
 			temporadas: '',
@@ -26,8 +27,10 @@ class FormularioSeries extends Component {
 
 	enviaDados = (e) => {
 		e.preventDefault()
-		this.props.enviaDados(this.state)
+		await this.props.enviaDados(this.state)
 		this.setState(this.stateInicial)
+		delete this.state.id
+		
 	}
 
 	render() {
